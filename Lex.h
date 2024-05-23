@@ -50,6 +50,7 @@ private:
 		make_pair("}", "RBRACE")
 	};
 	list<pair<string, string>> lex_out;
+	int state = 0;
 public:
 	void analysis(string str);
 	list<pair<string, string>> getLex_out();

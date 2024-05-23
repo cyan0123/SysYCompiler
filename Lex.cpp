@@ -3,9 +3,9 @@
 void Lex::analysis(string str)
 {
 	if (str == "") return;
-	int state = 0;
 	string tmp = "";
-	for (int f = 0; f <= str.length();)
+	bool isend = 0;
+	for (int f = 0; !isend;)
 	{
 		switch (state)
 		{
@@ -29,6 +29,10 @@ void Lex::analysis(string str)
 			{
 				state = 0;
 			}
+			else if (str[f] == '\0')
+			{
+				isend = 1;
+			}
 			else
 			{
 				state = 7;
@@ -49,7 +53,8 @@ void Lex::analysis(string str)
 			break;
 		case 3:
 			if ((str[f] >= 'A' && str[f] <= 'Z') ||
-				(str[f] >= 'a' && str[f] <= 'z'))
+				(str[f] >= 'a' && str[f] <= 'z') ||
+				(str[f] >= '0' && str[f] <= '9'))
 			{
 				state = 3;
 				tmp += str[f];
@@ -79,9 +84,22 @@ void Lex::analysis(string str)
 			state = 0;
 			break;
 		case 7:
-			if (category_code.find(tmp) != category_code.end())
+			if (tmp == "/")
+			{
+				state = 10;
+			}
+			else if	(category_code.find(tmp) != category_code.end())
 			{
 				lex_out.push_back(make_pair(category_code[tmp], tmp));
+				state = 0;
+			}
+			else
+			{
+				f++;
+			}
+			if (str[f] == '\0')
+			{
+				isend = 1;
 				state = 0;
 			}
 			break;
@@ -100,6 +118,45 @@ void Lex::analysis(string str)
 		case 9:
 			lex_out.push_back(make_pair(category_code["IntConst"], tmp));
 			state = 0;
+			break;
+		case 10:
+			if (str[f] == '/')
+			{
+				isend = 1;
+				state = 0;
+			}
+			else if (str[f] == '*')
+			{
+				state = 11;
+				f++;
+			}
+			else
+			{
+				lex_out.push_back(make_pair(category_code[tmp], tmp));
+				state = 0;
+			}
+			break;
+		case 11:
+			if (str[f] == '*')
+			{
+				state = 12;
+			}
+			else if (str[f] == '\0')
+			{
+				isend = 1;
+			}
+			f++;
+			break;
+		case 12:
+			if (str[f] == '/')
+			{
+				state = 0;
+				f++;
+			}
+			else
+			{
+				state = 11;
+			}
 			break;
 		default:
 			break;

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <map>
 #include <list>
+#include <string>
 #include <utility>
 
 #include "Lex.h"
