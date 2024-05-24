@@ -6,8 +6,9 @@
 #include <utility>
 
 #include "Lex.h"
+#include "Syntax.h"
 
-#define TEST 2
+#define TEST 3
 #define lexlist list<pair<string, string>>
 
 using namespace std;
@@ -32,6 +33,20 @@ int main()
 		for (lexlist::iterator it = res.begin(); it != res.end(); it++)
 		{
 			fout << it->first << ' ' << it->second << '\n';
+		}
+		fout.close();
+	}
+	else if (TEST == 3)
+	{
+		Syntax syn;
+		syn.analysis(lex.getLex_out());
+
+		ofstream fout;
+		fout.open("./output.txt", ios::out);
+		list<string> res = syn.getSyn_out();
+		for (list<string>::iterator it = res.begin(); it != res.end(); it++)
+		{
+			fout << *it << '\n';
 		}
 		fout.close();
 	}
