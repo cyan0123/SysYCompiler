@@ -90,7 +90,21 @@ void Lex::analysis(string str)
 			}
 			else if	(category_code.find(tmp) != category_code.end())
 			{
+				if (category_code.find(tmp + str[f]) != category_code.end())
+				{
+					tmp += str[f];
+					lex_out.push_back(make_pair(category_code[tmp], tmp));
+					f++;
+				}
+				else
+					lex_out.push_back(make_pair(category_code[tmp], tmp));
+				state = 0;
+			}
+			else if (category_code.find(tmp + str[f]) != category_code.end())
+			{
+				tmp += str[f];
 				lex_out.push_back(make_pair(category_code[tmp], tmp));
+				f++;
 				state = 0;
 			}
 			else
