@@ -453,7 +453,21 @@ bool Syntax::FuncFParam()
 					{
 						Syn_out.push_back(it_lex->first + " " + it_lex->second);
 						it_lex++;
-						if (!ConstExp())
+						if (ConstExp())
+						{
+							if (it_lex->second == "]")
+							{
+								Syn_out.push_back(it_lex->first + " " + it_lex->second);
+								it_lex++;
+							}
+							else
+							{
+								it_lex = tmp;
+								Syn_out.erase(++tmp_syn, Syn_out.end());
+								return false;
+							}
+						}
+						else
 						{
 							it_lex = tmp;
 							Syn_out.erase(++tmp_syn, Syn_out.end());
@@ -520,44 +534,104 @@ bool Syntax::Stmt()
 	lexlist_it tmp = it_lex;
 	synlist_it tmp_syn = Syn_out.end();
 	tmp_syn--;
-	if (LVal())
+	if (it_lex->first == "IDENFR")
 	{
-		if (it_lex->second == "=")
+		if (LVal())
 		{
-			Syn_out.push_back(it_lex->first + " " + it_lex->second);
-			it_lex++;
-			if (Exp())
-			{
-				if (it_lex->second == ";")
-				{
-					Syn_out.push_back(it_lex->first + " " + it_lex->second);
-					it_lex++;
-					Syn_out.push_back("<" + string(__func__) + ">");
-					return true;
-				}
-			}
-			else if (it_lex->second == "getint")
+			if (it_lex->second == "=")
 			{
 				Syn_out.push_back(it_lex->first + " " + it_lex->second);
 				it_lex++;
-				if (it_lex->second == "(")
+				if (Exp())
 				{
-					Syn_out.push_back(it_lex->first + " " + it_lex->second);
-					it_lex++;
-					if (it_lex->second == ")")
+					if (it_lex->second == ";")
 					{
 						Syn_out.push_back(it_lex->first + " " + it_lex->second);
 						it_lex++;
-						if (it_lex->second == ";")
+						Syn_out.push_back("<" + string(__func__) + ">");
+						return true;
+					}
+					else
+					{
+						it_lex = tmp;
+						synlist_it tmp_tmp_syn = tmp_syn;
+						Syn_out.erase(++tmp_syn, Syn_out.end());
+						tmp_syn = tmp_tmp_syn;
+					}
+				}
+				else if (it_lex->second == "getint")
+				{
+					Syn_out.push_back(it_lex->first + " " + it_lex->second);
+					it_lex++;
+					if (it_lex->second == "(")
+					{
+						Syn_out.push_back(it_lex->first + " " + it_lex->second);
+						it_lex++;
+						if (it_lex->second == ")")
 						{
 							Syn_out.push_back(it_lex->first + " " + it_lex->second);
 							it_lex++;
-							Syn_out.push_back("<" + string(__func__) + ">");
-							return true;
+							if (it_lex->second == ";")
+							{
+								Syn_out.push_back(it_lex->first + " " + it_lex->second);
+								it_lex++;
+								Syn_out.push_back("<" + string(__func__) + ">");
+								return true;
+							}
+							else
+							{
+								it_lex = tmp;
+								synlist_it tmp_tmp_syn = tmp_syn;
+								Syn_out.erase(++tmp_syn, Syn_out.end());
+								tmp_syn = tmp_tmp_syn;
+							}
+						}
+						else
+						{
+							it_lex = tmp;
+							synlist_it tmp_tmp_syn = tmp_syn;
+							Syn_out.erase(++tmp_syn, Syn_out.end());
+							tmp_syn = tmp_tmp_syn;
 						}
 					}
+					else
+					{
+						it_lex = tmp;
+						synlist_it tmp_tmp_syn = tmp_syn;
+						Syn_out.erase(++tmp_syn, Syn_out.end());
+						tmp_syn = tmp_tmp_syn;
+					}
+				}
+				else
+				{
+					it_lex = tmp;
+					synlist_it tmp_tmp_syn = tmp_syn;
+					Syn_out.erase(++tmp_syn, Syn_out.end());
+					tmp_syn = tmp_tmp_syn;
 				}
 			}
+			else
+			{
+				it_lex = tmp;
+				synlist_it tmp_tmp_syn = tmp_syn;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
+				tmp_syn = tmp_tmp_syn;
+			}
+		}
+		else
+		{
+			it_lex = tmp;
+			synlist_it tmp_tmp_syn = tmp_syn;
+			Syn_out.erase(++tmp_syn, Syn_out.end());
+			tmp_syn = tmp_tmp_syn;
+		}
+		if (Exp());
+		if (it_lex->second == ";")
+		{
+			Syn_out.push_back(it_lex->first + " " + it_lex->second);
+			it_lex++;
+			Syn_out.push_back("<" + string(__func__) + ">");
+			return true;
 		}
 	}
 	else if (Block())
@@ -842,12 +916,7 @@ bool Syntax::UnaryExp()
 	lexlist_it tmp = it_lex;
 	synlist_it tmp_syn = Syn_out.end();
 	tmp_syn--;
-	if (PrimaryExp())
-	{
-		Syn_out.push_back("<" + string(__func__) + ">");
-		return true;
-	}
-	else if (it_lex->first == "IDENFR")
+	if (it_lex->first == "IDENFR")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
 		it_lex++;
@@ -863,7 +932,31 @@ bool Syntax::UnaryExp()
 				Syn_out.push_back("<" + string(__func__) + ">");
 				return true;
 			}
+			else
+			{
+				it_lex = tmp;
+				synlist_it tmp_tmp_syn = tmp_syn;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
+				tmp_syn = tmp_tmp_syn;
+			}
 		}
+		else
+		{
+			it_lex = tmp;
+			synlist_it tmp_tmp_syn = tmp_syn;
+			Syn_out.erase(++tmp_syn, Syn_out.end());
+			tmp_syn = tmp_tmp_syn;
+		}
+		if (PrimaryExp())
+		{
+			Syn_out.push_back("<" + string(__func__) + ">");
+			return true;
+		}
+	}
+	else if (PrimaryExp())
+	{
+		Syn_out.push_back("<" + string(__func__) + ">");
+		return true;
 	}
 	else if (UnaryOp())
 	{
