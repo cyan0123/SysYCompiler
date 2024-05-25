@@ -942,34 +942,24 @@ bool Syntax::MulExp()
 	tmp_syn--;
 	if (UnaryExp())
 	{
-		if (_MulExp())
+		Syn_out.push_back("<" + string(__func__) + ">");
+		while (it_lex->second == "*" || it_lex->second == "/" || it_lex->second == "%")
 		{
+			Syn_out.push_back(it_lex->first + " " + it_lex->second);
+			it_lex++;
+			if (!UnaryExp())
+			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
+				return false;
+			}
 			Syn_out.push_back("<" + string(__func__) + ">");
-			return true;
 		}
+		return true;
 	}
 	it_lex = tmp;
 	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
-}
-
-bool Syntax::_MulExp()
-{
-	lexlist_it tmp = it_lex;
-	synlist_it tmp_syn = Syn_out.end();
-	tmp_syn--;
-	while (it_lex->second == "*" || it_lex->second == "/" || it_lex->second == "%")
-	{
-		Syn_out.push_back(it_lex->first + " " + it_lex->second);
-		it_lex++;
-		if (!UnaryExp())
-		{
-			it_lex = tmp;
-			Syn_out.erase(++tmp_syn, Syn_out.end());
-			return false;
-		}
-	}
-	return true;
 }
 
 bool Syntax::AddExp()
@@ -979,34 +969,24 @@ bool Syntax::AddExp()
 	tmp_syn--;
 	if (MulExp())
 	{
-		if (_AddExp())
+		Syn_out.push_back("<" + string(__func__) + ">");
+		while (it_lex->second == "+" || it_lex->second == "-")
 		{
+			Syn_out.push_back(it_lex->first + " " + it_lex->second);
+			it_lex++;
+			if (!MulExp())
+			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
+				return false;
+			}
 			Syn_out.push_back("<" + string(__func__) + ">");
-			return true;
 		}
+		return true;
 	}
 	it_lex = tmp;
 	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
-}
-
-bool Syntax::_AddExp()
-{
-	lexlist_it tmp = it_lex;
-	synlist_it tmp_syn = Syn_out.end();
-	tmp_syn--;
-	while (it_lex->second == "+" || it_lex->second == "-")
-	{
-		Syn_out.push_back(it_lex->first + " " + it_lex->second);
-		it_lex++;
-		if (!MulExp())
-		{
-			it_lex = tmp;
-			Syn_out.erase(++tmp_syn, Syn_out.end());
-			return false;
-		}
-	}
-	return true;
 }
 
 bool Syntax::RelExp()
@@ -1016,35 +996,25 @@ bool Syntax::RelExp()
 	tmp_syn--;
 	if (AddExp())
 	{
-		if (_RelExp())
+		Syn_out.push_back("<" + string(__func__) + ">");
+		while (it_lex->second == ">" || it_lex->second == "<" ||
+			it_lex->second == "<=" || it_lex->second == ">=")
 		{
+			Syn_out.push_back(it_lex->first + " " + it_lex->second);
+			it_lex++;
+			if (!AddExp())
+			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
+				return false;
+			}
 			Syn_out.push_back("<" + string(__func__) + ">");
-			return true;
 		}
+		return true;
 	}
 	it_lex = tmp;
 	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
-}
-
-bool Syntax::_RelExp()
-{
-	lexlist_it tmp = it_lex;
-	synlist_it tmp_syn = Syn_out.end();
-	tmp_syn--;
-	while (it_lex->second == ">" || it_lex->second == "<" ||
-		it_lex->second == "<=" || it_lex->second == ">=")
-	{
-		Syn_out.push_back(it_lex->first + " " + it_lex->second);
-		it_lex++;
-		if (!AddExp())
-		{
-			it_lex = tmp;
-			Syn_out.erase(++tmp_syn, Syn_out.end());
-			return false;
-		}
-	}
-	return true;
 }
 
 bool Syntax::EqExp()
@@ -1054,34 +1024,24 @@ bool Syntax::EqExp()
 	tmp_syn--;
 	if (RelExp())
 	{
-		if (_EqExp())
+		Syn_out.push_back("<" + string(__func__) + ">");
+		while (it_lex->second == "==" || it_lex->second == "!=")
 		{
+			Syn_out.push_back(it_lex->first + " " + it_lex->second);
+			it_lex++;
+			if (!RelExp())
+			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
+				return false;
+			}
 			Syn_out.push_back("<" + string(__func__) + ">");
-			return true;
 		}
+		return true;
 	}
 	it_lex = tmp;
 	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
-}
-
-bool Syntax::_EqExp()
-{
-	lexlist_it tmp = it_lex;
-	synlist_it tmp_syn = Syn_out.end();
-	tmp_syn--;
-	while (it_lex->second == "==" || it_lex->second == "!=")
-	{
-		Syn_out.push_back(it_lex->first + " " + it_lex->second);
-		it_lex++;
-		if (!RelExp())
-		{
-			it_lex = tmp;
-			Syn_out.erase(++tmp_syn, Syn_out.end());
-			return false;
-		}
-	}
-	return true;
 }
 
 bool Syntax::LAndExp()
@@ -1091,34 +1051,24 @@ bool Syntax::LAndExp()
 	tmp_syn--;
 	if (EqExp())
 	{
-		if (_LAndExp())
+		Syn_out.push_back("<" + string(__func__) + ">");
+		while (it_lex->second == "&&")
 		{
+			Syn_out.push_back(it_lex->first + " " + it_lex->second);
+			it_lex++;
+			if (!EqExp())
+			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
+				return false;
+			}
 			Syn_out.push_back("<" + string(__func__) + ">");
-			return true;
 		}
+		return true;
 	}
 	it_lex = tmp;
 	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
-}
-
-bool Syntax::_LAndExp()
-{
-	lexlist_it tmp = it_lex;
-	synlist_it tmp_syn = Syn_out.end();
-	tmp_syn--;
-	while (it_lex->second == "&&")
-	{
-		Syn_out.push_back(it_lex->first + " " + it_lex->second);
-		it_lex++;
-		if (!EqExp())
-		{
-			it_lex = tmp;
-			Syn_out.erase(++tmp_syn, Syn_out.end());
-			return false;
-		}
-	}
-	return true;
 }
 
 bool Syntax::LOrExp()
@@ -1128,34 +1078,24 @@ bool Syntax::LOrExp()
 	tmp_syn--;
 	if (LAndExp())
 	{
-		if (_LOrExp())
+		Syn_out.push_back("<" + string(__func__) + ">");
+		while (it_lex->second == "||")
 		{
+			Syn_out.push_back(it_lex->first + " " + it_lex->second);
+			it_lex++;
+			if (!LAndExp())
+			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
+				return false;
+			}
 			Syn_out.push_back("<" + string(__func__) + ">");
-			return true;
 		}
+		return true;
 	}
 	it_lex = tmp;
 	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
-}
-
-bool Syntax::_LOrExp()
-{
-	lexlist_it tmp = it_lex;
-	synlist_it tmp_syn = Syn_out.end();
-	tmp_syn--;
-	while (it_lex->second == "||")
-	{
-		Syn_out.push_back(it_lex->first + " " + it_lex->second);
-		it_lex++;
-		if (!LAndExp())
-		{
-			it_lex = tmp;
-			Syn_out.erase(++tmp_syn, Syn_out.end());
-			return false;
-		}
-	}
-	return true;
 }
 
 bool Syntax::ConstExp()

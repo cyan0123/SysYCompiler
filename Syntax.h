@@ -34,17 +34,11 @@ private:
 	bool UnaryOp();
 	bool FuncRParams();
 	bool MulExp();
-	bool _MulExp();
 	bool AddExp();
-	bool _AddExp();
 	bool RelExp();
-	bool _RelExp();
 	bool EqExp();
-	bool _EqExp();
 	bool LAndExp();
-	bool _LAndExp();
 	bool LOrExp();
-	bool _LOrExp();
 	bool ConstExp();
 public:
 	void analysis(list<pair<string, string>> lex_out);
