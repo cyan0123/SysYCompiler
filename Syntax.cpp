@@ -1,9 +1,12 @@
 #include "Syntax.h"
+#define lexlist_it list<pair<string, string>>::iterator 
+#define synlist_it list<string>::iterator
 
 void Syntax::analysis(list<pair<string, string>> lex_out)
 {
 	it_lex = lex_out.begin();
 	CompUnit();
+	Syn_out.pop_front();
 }
 
 list<string> Syntax::getSyn_out()
@@ -20,22 +23,29 @@ bool Syntax::CompUnit()
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
-
 	return false;
 }
 
 bool Syntax::Decl()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (ConstDecl() || VarDecl())
 	{
-		Syn_out.push_back("<" + string(__func__) + ">");
+		//Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::ConstDecl()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (it_lex->second == "const")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
@@ -47,7 +57,11 @@ bool Syntax::ConstDecl()
 				Syn_out.push_back(it_lex->first + " " + it_lex->second);
 				it_lex++;
 				if (!ConstDef())
+				{
+					it_lex = tmp;
+					Syn_out.erase(++tmp_syn, Syn_out.end());
 					return false;
+				}
 			}
 			if (it_lex->second == ";")
 			{
@@ -58,23 +72,33 @@ bool Syntax::ConstDecl()
 			}
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::BType()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (it_lex->second == "int")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
 		it_lex++;
-		Syn_out.push_back("<" + string(__func__) + ">");
+		//Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::ConstDef()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (it_lex->first == "IDENFR")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
@@ -92,11 +116,15 @@ bool Syntax::ConstDef()
 				}
 				else
 				{
+					it_lex = tmp;
+					Syn_out.erase(++tmp_syn, Syn_out.end());
 					return false;
 				}
 			}
 			else
 			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
 				return false;
 			}
 		}
@@ -112,11 +140,16 @@ bool Syntax::ConstDef()
 		}
 		
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::ConstInitVal()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (ConstExp())
 	{
 		Syn_out.push_back("<" + string(__func__) + ">");
@@ -134,6 +167,8 @@ bool Syntax::ConstInitVal()
 				it_lex++;
 				if (!ConstInitVal())
 				{
+					it_lex = tmp;
+					Syn_out.erase(++tmp_syn, Syn_out.end());
 					return false;
 				}
 			}
@@ -146,11 +181,16 @@ bool Syntax::ConstInitVal()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::VarDecl()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (BType() && VarDef())
 	{
 		while (it_lex->second == ",")
@@ -158,7 +198,11 @@ bool Syntax::VarDecl()
 			Syn_out.push_back(it_lex->first + " " + it_lex->second);
 			it_lex++;
 			if (!VarDef())
+			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
 				return false;
+			}
 		}
 		if (it_lex->second == ";")
 		{
@@ -168,11 +212,16 @@ bool Syntax::VarDecl()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::VarDef()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (it_lex->first == "IDENFR")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
@@ -190,11 +239,15 @@ bool Syntax::VarDef()
 				}
 				else
 				{
+					it_lex = tmp;
+					Syn_out.erase(++tmp_syn, Syn_out.end());
 					return false;
 				}
 			}
 			else
 			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
 				return false;
 			}
 		}
@@ -204,17 +257,24 @@ bool Syntax::VarDef()
 			it_lex++;
 			if (!InitVal())
 			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
 				return false;
 			}
 		}
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::InitVal()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (Exp())
 	{
 		Syn_out.push_back("<" + string(__func__) + ">");
@@ -232,6 +292,8 @@ bool Syntax::InitVal()
 				it_lex++;
 				if (!InitVal())
 				{
+					it_lex = tmp;
+					Syn_out.erase(++tmp_syn, Syn_out.end());
 					return false;
 				}
 			}
@@ -244,11 +306,16 @@ bool Syntax::InitVal()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::FuncDef()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (FuncType())
 	{
 		if (it_lex->first == "IDENFR")
@@ -273,11 +340,16 @@ bool Syntax::FuncDef()
 			}
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::MainFuncDef()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (it_lex->second == "int")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
@@ -303,11 +375,16 @@ bool Syntax::MainFuncDef()
 			}
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::FuncType()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (it_lex->second == "int")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
@@ -322,11 +399,16 @@ bool Syntax::FuncType()
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::FuncFParams()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (FuncFParam())
 	{
 		while (it_lex->second == ",")
@@ -335,17 +417,24 @@ bool Syntax::FuncFParams()
 			it_lex++;
 			if (!FuncFParam())
 			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
 				return false;
 			}
 		}
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::FuncFParam()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (BType())
 	{
 		if (it_lex->first == "IDENFR")
@@ -366,12 +455,16 @@ bool Syntax::FuncFParam()
 						it_lex++;
 						if (!ConstExp())
 						{
+							it_lex = tmp;
+							Syn_out.erase(++tmp_syn, Syn_out.end());
 							return false;
 						}
 					}
 				}
 				else
 				{
+					it_lex = tmp;
+					Syn_out.erase(++tmp_syn, Syn_out.end());
 					return false;
 				}
 			}
@@ -379,11 +472,16 @@ bool Syntax::FuncFParam()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::Block()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (it_lex->second == "{")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
@@ -397,21 +495,31 @@ bool Syntax::Block()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::BlockItem()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (Decl() || Stmt())
 	{
-		Syn_out.push_back("<" + string(__func__) + ">");
+		//Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::Stmt()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (LVal())
 	{
 		if (it_lex->second == "=")
@@ -479,6 +587,8 @@ bool Syntax::Stmt()
 							it_lex++;
 							if (!Stmt())
 							{
+								it_lex = tmp;
+								Syn_out.erase(++tmp_syn, Syn_out.end());
 								return false;
 							}
 						}
@@ -567,6 +677,8 @@ bool Syntax::Stmt()
 					it_lex++;
 					if (!Exp())
 					{
+						it_lex = tmp;
+						Syn_out.erase(++tmp_syn, Syn_out.end());
 						return false;
 					}
 				}
@@ -596,31 +708,46 @@ bool Syntax::Stmt()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::Exp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (AddExp())
 	{
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::Cond()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (LOrExp())
 	{
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::LVal()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (it_lex->first == "IDENFR")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
@@ -638,22 +765,31 @@ bool Syntax::LVal()
 				}
 				else
 				{
+					it_lex = tmp;
+					Syn_out.erase(++tmp_syn, Syn_out.end());
 					return false;
 				}
 			}
 			else
 			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
 				return false;
 			}
 		}
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::PrimaryExp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (it_lex->second == "(")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
@@ -679,11 +815,16 @@ bool Syntax::PrimaryExp()
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::Number()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (it_lex->first == "INTCON")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
@@ -691,11 +832,16 @@ bool Syntax::Number()
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::UnaryExp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (PrimaryExp())
 	{
 		Syn_out.push_back("<" + string(__func__) + ">");
@@ -727,11 +873,16 @@ bool Syntax::UnaryExp()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::UnaryOp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (it_lex->second == "+")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
@@ -753,11 +904,16 @@ bool Syntax::UnaryOp()
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::FuncRParams()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (Exp())
 	{
 		while (it_lex->second == ",")
@@ -766,17 +922,24 @@ bool Syntax::FuncRParams()
 			it_lex++;
 			if (!Exp())
 			{
+				it_lex = tmp;
+				Syn_out.erase(++tmp_syn, Syn_out.end());
 				return false;
 			}
 		}
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::MulExp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (UnaryExp())
 	{
 		if (_MulExp())
@@ -785,17 +948,24 @@ bool Syntax::MulExp()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::_MulExp()
 {
-	while (it_lex->second == "*" || it_lex->first == "/" || it_lex->first == "%")
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
+	while (it_lex->second == "*" || it_lex->second == "/" || it_lex->second == "%")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
 		it_lex++;
 		if (!UnaryExp())
 		{
+			it_lex = tmp;
+			Syn_out.erase(++tmp_syn, Syn_out.end());
 			return false;
 		}
 	}
@@ -804,6 +974,9 @@ bool Syntax::_MulExp()
 
 bool Syntax::AddExp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (MulExp())
 	{
 		if (_AddExp())
@@ -812,17 +985,24 @@ bool Syntax::AddExp()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::_AddExp()
 {
-	while (it_lex->second == "+" || it_lex->first == "-")
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
+	while (it_lex->second == "+" || it_lex->second == "-")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
 		it_lex++;
 		if (!MulExp())
 		{
+			it_lex = tmp;
+			Syn_out.erase(++tmp_syn, Syn_out.end());
 			return false;
 		}
 	}
@@ -831,6 +1011,9 @@ bool Syntax::_AddExp()
 
 bool Syntax::RelExp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (AddExp())
 	{
 		if (_RelExp())
@@ -839,18 +1022,25 @@ bool Syntax::RelExp()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::_RelExp()
 {
-	while (it_lex->second == ">" || it_lex->first == "<" || 
-		it_lex->first == "<=" || it_lex->first == ">=")
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
+	while (it_lex->second == ">" || it_lex->second == "<" ||
+		it_lex->second == "<=" || it_lex->second == ">=")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
 		it_lex++;
 		if (!AddExp())
 		{
+			it_lex = tmp;
+			Syn_out.erase(++tmp_syn, Syn_out.end());
 			return false;
 		}
 	}
@@ -859,6 +1049,9 @@ bool Syntax::_RelExp()
 
 bool Syntax::EqExp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (RelExp())
 	{
 		if (_EqExp())
@@ -867,17 +1060,24 @@ bool Syntax::EqExp()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::_EqExp()
 {
-	while (it_lex->second == "==" || it_lex->first == "!=")
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
+	while (it_lex->second == "==" || it_lex->second == "!=")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
 		it_lex++;
 		if (!RelExp())
 		{
+			it_lex = tmp;
+			Syn_out.erase(++tmp_syn, Syn_out.end());
 			return false;
 		}
 	}
@@ -886,6 +1086,9 @@ bool Syntax::_EqExp()
 
 bool Syntax::LAndExp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (EqExp())
 	{
 		if (_LAndExp())
@@ -894,17 +1097,24 @@ bool Syntax::LAndExp()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::_LAndExp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	while (it_lex->second == "&&")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
 		it_lex++;
 		if (!EqExp())
 		{
+			it_lex = tmp;
+			Syn_out.erase(++tmp_syn, Syn_out.end());
 			return false;
 		}
 	}
@@ -913,6 +1123,9 @@ bool Syntax::_LAndExp()
 
 bool Syntax::LOrExp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (LAndExp())
 	{
 		if (_LOrExp())
@@ -921,17 +1134,24 @@ bool Syntax::LOrExp()
 			return true;
 		}
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
 
 bool Syntax::_LOrExp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	while (it_lex->second == "||")
 	{
 		Syn_out.push_back(it_lex->first + " " + it_lex->second);
 		it_lex++;
 		if (!LAndExp())
 		{
+			it_lex = tmp;
+			Syn_out.erase(++tmp_syn, Syn_out.end());
 			return false;
 		}
 	}
@@ -940,11 +1160,15 @@ bool Syntax::_LOrExp()
 
 bool Syntax::ConstExp()
 {
+	lexlist_it tmp = it_lex;
+	synlist_it tmp_syn = Syn_out.end();
+	tmp_syn--;
 	if (AddExp())
 	{
 		Syn_out.push_back("<" + string(__func__) + ">");
 		return true;
 	}
+	it_lex = tmp;
+	Syn_out.erase(++tmp_syn, Syn_out.end());
 	return false;
 }
-

@@ -6,7 +6,7 @@ using namespace std;
 class Syntax
 {
 private:
-	list<string> Syn_out;
+	list<string> Syn_out = {""};
 	list<pair<string, string>>::iterator it_lex;
 	bool CompUnit();
 	bool Decl();
